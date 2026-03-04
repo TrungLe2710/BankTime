@@ -18,8 +18,8 @@
         <template x-if="!mu?.av">
           <div class="w-24 h-24 bg-gradient-to-tr from-blue-100 to-purple-100 text-purple-600 rounded-full flex items-center justify-center text-4xl font-black mx-auto border-4 border-white shadow-md" x-text="mu?.n?.[0]"></div>
         </template>
-        <div class="font-black text-2xl mt-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600" x-text="'@' + mu?.n"></div>
-        <div class="text-xs font-bold text-purple-500 mt-1 uppercase" x-text="'hạng ' + rk(mu?.r)"></div>
+        <div class="font-black text-2xl mt-4" :class="cl(mu?.r)" x-text="'@' + mu?.n"></div>
+        <div class="text-xs font-bold text-slate-500 mt-1 uppercase" x-text="'hạng ' + rk(mu?.r)"></div>
       </div>
       <div class="bg-slate-50 p-4 rounded-2xl text-sm text-slate-600 text-center mb-6 font-medium border border-slate-100 shadow-inner" x-text="mu?.bo || 'người này chưa viết tiểu sử.'"></div>
       <div class="flex flex-col gap-3">
@@ -66,54 +66,100 @@
       </div>
     </nav>
 
-    <div class="max-w-3xl mx-auto mt-8 pb-16">
+    <div class="max-w-5xl mx-auto mt-8 pb-16 px-4">
       
-      <div x-show="v == 1" class="flex flex-col gap-6">
-        <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-white hover:shadow-2xl transition-all duration-300">
-          <div class="flex gap-4 items-start mb-4">
-            <button @click="op(cu?.n)" class="w-12 h-12 bg-gradient-to-tr from-blue-100 to-purple-100 text-purple-600 rounded-full flex items-center justify-center font-black text-xl shadow-inner border border-white hover:scale-105 transition-transform" x-text="cu?.n[0]"></button>
-            <textarea x-model="td" placeholder="bạn đang cần giúp đỡ việc gì?" class="w-full border-none outline-none resize-none bg-transparent text-slate-700 placeholder-slate-400 mt-2 font-medium" rows="2"></textarea>
-          </div>
-          <div class="flex justify-between items-center border-t border-slate-100 pt-4">
-            <div class="flex gap-3">
-              <input type="number" x-model="th" min="1" class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-sm outline-none w-24 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-bold text-amber-600" placeholder="giờ">
-              <select x-model="tv" class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-sm outline-none focus:border-purple-500 font-medium text-slate-600 cursor-pointer">
-                <option value="0">công khai</option>
-                <option value="1">riêng tư</option>
-              </select>
+      <div x-show="v == 1" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2 flex flex-col gap-6">
+          <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-xl border border-white hover:shadow-2xl transition-all duration-300">
+            <div class="flex gap-4 items-start mb-4">
+              <button @click="op(cu?.n)" class="w-12 h-12 bg-gradient-to-tr from-blue-100 to-purple-100 text-purple-600 rounded-full flex items-center justify-center font-black text-xl shadow-inner border border-white hover:scale-105 transition-transform" x-text="cu?.n[0]"></button>
+              <textarea x-model="td" placeholder="bạn đang cần giúp đỡ việc gì?" class="w-full border-none outline-none resize-none bg-transparent text-slate-700 placeholder-slate-400 mt-2 font-medium" rows="2"></textarea>
             </div>
-            <button @click="add()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">đăng bài</button>
+            <div class="flex justify-between items-center border-t border-slate-100 pt-4">
+              <div class="flex gap-3">
+                <input type="number" x-model="th" min="1" class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-sm outline-none w-24 focus:border-purple-500 focus:ring-2 focus:ring-purple-100 transition-all font-bold text-amber-600" placeholder="giờ">
+                <select x-model="tv" class="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-sm outline-none focus:border-purple-500 font-medium text-slate-600 cursor-pointer">
+                  <option value="0">công khai</option>
+                  <option value="1">riêng tư</option>
+                </select>
+              </div>
+              <button @click="add()" class="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-xl text-sm font-bold shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1">đăng bài</button>
+            </div>
           </div>
-        </div>
 
-        <template x-for="x in tk.slice().reverse()">
-          <div x-show="x.v == 0" class="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
-            <div class="flex justify-between items-start mb-4">
-              <div class="flex items-center gap-3">
-                <button @click="op(x.o)" class="w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center font-bold border border-slate-200 hover:scale-110 transition-transform" x-text="x.o[0]"></button>
-                <div>
-                  <button @click="op(x.o)" class="font-bold text-slate-800 hover:text-purple-600 transition-colors" x-text="'@' + x.o"></button>
-                  <div class="text-xs font-medium" :class="x.st == 0 ? 'text-emerald-500' : (x.st == 1 ? 'text-blue-500' : 'text-slate-400')" x-text="x.st == 0 ? 'đang mở' : (x.st == 1 ? 'đang làm' : 'đã xong')"></div>
+          <template x-for="x in tk.slice().reverse()">
+            <div x-show="x.v == 0" class="bg-white/90 backdrop-blur-md p-6 rounded-3xl shadow-lg border border-white hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1 group">
+              <div class="flex justify-between items-start mb-4">
+                <div class="flex items-center gap-3">
+                  <button @click="op(x.o)" class="w-10 h-10 bg-slate-100 text-slate-600 rounded-full flex items-center justify-center font-bold border border-slate-200 hover:scale-110 transition-transform" x-text="x.o[0]"></button>
+                  <div>
+                    <button @click="op(x.o)" class="font-bold hover:underline transition-colors" :class="cl(gu(x.o).r)" x-text="'@' + x.o"></button>
+                    <div class="text-xs font-medium" :class="x.st == 0 ? 'text-emerald-500' : (x.st == 1 ? 'text-blue-500' : 'text-slate-400')" x-text="x.st == 0 ? 'đang mở' : (x.st == 1 ? 'đang làm' : 'đã xong')"></div>
+                  </div>
+                </div>
+                <span class="text-amber-600 font-black bg-amber-50 px-4 py-1.5 rounded-xl border border-amber-100 shadow-sm" x-text="x.h + ' giờ'"></span>
+              </div>
+              <div class="text-slate-700 text-sm mb-6 leading-relaxed font-medium" x-text="x.d"></div>
+              <div class="flex justify-between items-center pt-4 border-t border-slate-100">
+                <div x-show="x.st == 1" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-lg" x-text="'nhận bởi: @' + x.w"></div>
+                <div x-show="x.st != 1"></div>
+                
+                <div class="flex gap-2">
+                  <button x-show="x.st == 0 && x.o != cu?.n" @click="take(x.i)" class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">nhận việc ngay</button>
+                  <button x-show="x.st == 1 && x.w == cu?.n" @click="so(x)" class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">gửi kết quả</button>
+                  <button x-show="x.st == 1 && x.o == cu?.n" @click="done(x.i)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">xác nhận hoàn thành</button>
                 </div>
               </div>
-              <span class="text-amber-600 font-black bg-amber-50 px-4 py-1.5 rounded-xl border border-amber-100 shadow-sm" x-text="x.h + ' giờ'"></span>
             </div>
-            <div class="text-slate-700 text-sm mb-6 leading-relaxed font-medium" x-text="x.d"></div>
-            <div class="flex justify-between items-center pt-4 border-t border-slate-100">
-              <div x-show="x.st == 1" class="text-blue-600 font-bold text-sm bg-blue-50 px-3 py-1 rounded-lg" x-text="'nhận bởi: @' + x.w"></div>
-              <div x-show="x.st != 1"></div>
-              
-              <div class="flex gap-2">
-                <button x-show="x.st == 0 && x.o != cu?.n" @click="take(x.i)" class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">nhận việc ngay</button>
-                <button x-show="x.st == 1 && x.w == cu?.n" @click="so(x)" class="bg-gradient-to-r from-blue-400 to-blue-500 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">gửi kết quả</button>
-                <button x-show="x.st == 1 && x.o == cu?.n" @click="done(x.i)" class="bg-gradient-to-r from-emerald-400 to-emerald-500 text-white px-5 py-2 rounded-xl text-sm font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-1">xác nhận hoàn thành</button>
+          </template>
+        </div>
+
+        <div class="lg:col-span-1 flex flex-col gap-6">
+          <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-4 border-b border-white">
+              <div class="font-black text-lg text-slate-800 tracking-tight flex items-center gap-2">🏆 top uy tín</div>
+            </div>
+            <div class="p-4 flex flex-col gap-1">
+              <div class="flex justify-between items-center px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-2">
+                <div class="flex gap-4"><span class="w-4">#</span><span>thành viên</span></div>
+                <span>điểm</span>
               </div>
+              <template x-for="(x, i) in tp()">
+                <div class="flex justify-between items-center px-2 py-2 hover:bg-slate-50 rounded-xl transition-colors">
+                  <div class="flex items-center gap-4">
+                     <span class="font-bold text-slate-400 w-4 text-sm" x-text="i+1"></span>
+                     <button @click="op(x.n)" class="font-bold text-sm hover:underline" :class="cl(x.r)" x-text="'@' + x.n"></button>
+                  </div>
+                  <span class="font-bold text-emerald-600 text-sm" x-text="x.r"></span>
+                </div>
+              </template>
             </div>
           </div>
-        </template>
+
+          <div class="bg-white/90 backdrop-blur-md rounded-3xl shadow-xl border border-white overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-4 border-b border-white">
+              <div class="font-black text-lg text-slate-800 tracking-tight flex items-center gap-2">⏳ đại gia thời gian</div>
+            </div>
+            <div class="p-4 flex flex-col gap-1">
+              <div class="flex justify-between items-center px-2 py-1 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-2">
+                <div class="flex gap-4"><span class="w-4">#</span><span>thành viên</span></div>
+                <span>số giờ</span>
+              </div>
+              <template x-for="(x, i) in tg()">
+                <div class="flex justify-between items-center px-2 py-2 hover:bg-slate-50 rounded-xl transition-colors">
+                  <div class="flex items-center gap-4">
+                     <span class="font-bold text-slate-400 w-4 text-sm" x-text="i+1"></span>
+                     <button @click="op(x.n)" class="font-bold text-sm hover:underline" :class="cl(x.r)" x-text="'@' + x.n"></button>
+                  </div>
+                  <span class="font-bold text-amber-600 text-sm" x-text="x.h"></span>
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div x-show="v == 2">
+      <div x-show="v == 2" class="max-w-4xl mx-auto">
         <div class="font-black text-3xl mb-8 text-slate-800 tracking-tight flex items-center gap-3"><span class="text-4xl">🛒</span> cửa hàng</div>
         <div class="grid grid-cols-2 gap-6">
           <template x-for="x in st">
@@ -126,7 +172,7 @@
         </div>
       </div>
 
-      <div x-show="v == 3" class="flex flex-col gap-8">
+      <div x-show="v == 3" class="max-w-4xl mx-auto flex flex-col gap-8">
         <div class="bg-white/90 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white text-center relative overflow-hidden">
           <div class="absolute top-0 left-0 w-full h-32 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 opacity-20"></div>
           <template x-if="gu(pu).av">
@@ -135,8 +181,8 @@
           <template x-if="!gu(pu).av">
             <div class="w-32 h-32 bg-gradient-to-tr from-blue-100 to-purple-100 text-purple-600 rounded-full flex items-center justify-center text-5xl font-black mx-auto mb-6 border-4 border-white shadow-xl relative z-10 transform hover:scale-105 transition-all" x-text="gu(pu).n?.[0]"></div>
           </template>
-          <div class="text-center text-3xl font-black relative z-10 text-slate-800 tracking-tight" x-text="'@' + gu(pu).n"></div>
-          <div class="text-center text-purple-600 font-bold text-sm relative z-10 mb-5 uppercase tracking-widest" x-text="'hạng ' + rk(gu(pu).r)"></div>
+          <div class="text-center text-3xl font-black relative z-10 tracking-tight" :class="cl(gu(pu).r)" x-text="'@' + gu(pu).n"></div>
+          <div class="text-center text-slate-500 font-bold text-sm relative z-10 mb-5 uppercase tracking-widest" x-text="'hạng ' + rk(gu(pu).r)"></div>
           <div class="text-center text-slate-600 text-sm mt-4 bg-slate-50/80 p-5 rounded-2xl relative z-10 font-medium shadow-inner border border-slate-100" x-text="gu(pu).bo || 'người dùng này chưa viết gì cả.'"></div>
           
           <div x-show="pu == cu?.n" class="mt-8 flex flex-col gap-3 relative z-10 text-left bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
@@ -190,7 +236,7 @@
         </div>
       </div>
 
-      <div x-show="v == 4" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div x-show="v == 4" class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
         <div>
           <div class="font-black text-2xl mb-6 text-slate-800 tracking-tight">bạn bè của tôi</div>
           <div class="flex flex-col gap-4">
@@ -199,7 +245,7 @@
             </template>
             <template x-for="x in fl()">
               <div class="bg-white/90 backdrop-blur-md p-5 rounded-3xl shadow-md border border-white flex justify-between items-center hover:shadow-lg transition-all transform hover:-translate-y-1">
-                <button @click="op(x)" class="font-black text-lg text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105 transition-transform" x-text="'@' + x"></button>
+                <button @click="op(x)" class="font-black text-lg hover:underline transition-colors" :class="cl(gu(x).r)" x-text="'@' + x"></button>
                 <button @click="oc(x)" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-200 transition-colors">nhắn tin</button>
               </div>
             </template>
@@ -214,7 +260,7 @@
             <div class="flex flex-col gap-3">
               <template x-for="x in sl()">
                 <div class="bg-purple-50 p-4 border border-purple-100 rounded-2xl flex justify-between items-center shadow-sm">
-                  <button @click="op(x.n)" class="font-bold text-purple-700 hover:scale-105 transition-transform" x-text="'@' + x.n"></button>
+                  <button @click="op(x.n)" class="font-bold hover:underline transition-colors" :class="cl(x.r)" x-text="'@' + x.n"></button>
                   <button @click="af(x.n)" class="bg-purple-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5">kết bạn</button>
                 </div>
               </template>
@@ -223,7 +269,7 @@
         </div>
       </div>
 
-      <div x-show="v == 5">
+      <div x-show="v == 5" class="max-w-3xl mx-auto">
         <div class="font-black text-3xl mb-8 text-slate-800 tracking-tight">hộp thư tin nhắn</div>
         <div class="flex flex-col gap-4">
           <template x-if="ib().length == 0">
@@ -232,17 +278,17 @@
           <template x-for="x in ib()">
             <button @click="oc(x)" class="w-full flex items-center gap-5 bg-white/90 backdrop-blur-md p-5 rounded-3xl shadow-md border border-white hover:shadow-xl transition-all transform hover:-translate-y-1 text-left">
               <div class="w-14 h-14 bg-gradient-to-tr from-blue-100 to-purple-100 text-purple-600 rounded-full flex items-center justify-center font-black text-xl shadow-inner border border-white" x-text="x[0]"></div>
-              <div class="font-black text-lg text-slate-700" x-text="'@' + x"></div>
+              <div class="font-black text-lg" :class="cl(gu(x).r)" x-text="'@' + x"></div>
             </button>
           </template>
         </div>
       </div>
 
-      <div x-show="v == 6">
+      <div x-show="v == 6" class="max-w-3xl mx-auto">
         <div class="bg-white/90 backdrop-blur-md shadow-2xl rounded-3xl border border-white flex flex-col h-[600px] overflow-hidden transform transition-all">
           <div class="p-5 border-b border-slate-100 bg-white/80 flex items-center gap-4">
             <button @click="v = 5" class="text-slate-400 hover:text-purple-600 font-bold text-sm bg-slate-100 px-3 py-1.5 rounded-lg transition-colors">quay lại</button>
-            <button @click="op(cc)" class="font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 hover:scale-105 transition-transform" x-text="'@' + cc"></button>
+            <button @click="op(cc)" class="font-black text-xl hover:underline transition-colors" :class="cl(gu(cc).r)" x-text="'@' + cc"></button>
           </div>
           <div class="flex-1 p-6 overflow-y-auto bg-slate-50/50 flex flex-col justify-end">
             <div class="w-full">
