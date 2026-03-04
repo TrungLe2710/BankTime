@@ -22,7 +22,9 @@ if (f.existsSync('db.json')) {
 let sv = () => {
   f.writeFileSync('db.json', JSON.stringify({ u, t, m, fr, id }));
 };
-
+a.get('/hoahoc', (q, rs) => {
+  rs.sendFile(__dirname + '/hoahoc.html');
+});
 a.get('/api', (q, rs) => {
   let c = q.query.c;
   if (c == 'reg') {
