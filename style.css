@@ -1,0 +1,4 @@
+body { font-family: sans-serif; }
+.s { box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); }
+.t { transition: all 0.2s; }
+.h:hover { transform: translate(0, -2px); }
