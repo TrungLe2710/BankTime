@@ -80,11 +80,20 @@ let app = () => ({
     return this.us.filter(x => x.n.includes(this.sf) && x.n != this.cu.n);
   },
   rk(p) { return (p / 10) | 0; },
+  cl(p) {
+    let r = (p / 10) | 0;
+    if (r == 0) return 'text-slate-600';
+    if (r == 1) return 'text-blue-500';
+    if (r == 2) return 'text-purple-500';
+    return 'text-rose-500 font-black';
+  },
   mp() {
     return this.tk.filter(x => x.o == this.pu && (this.pu == this.cu.n || x.v == 0)).reverse();
   },
   gu(n) {
     for (let i = 0; i < this.us.length; i++) if (this.us[i].n == n) return this.us[i];
     return {};
-  }
+  },
+  tp() { return [...this.us].sort((a,b) => b.r - a.r).slice(0, 10); },
+  tg() { return [...this.us].sort((a,b) => b.h - a.h).slice(0, 10); }
 });
