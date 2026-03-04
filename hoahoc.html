@@ -1,0 +1,835 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hydrocarbon - Grade 11 Chemistry</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Quicksand', sans-serif; }
+    * { transition: background-color 0.2s, color 0.2s, border-color 0.2s; }
+    
+    .card-flip { perspective: 1000px; }
+    .card-inner { transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); transform-style: preserve-3d; }
+    .card-inner.flipped { transform: rotateY(180deg); }
+    .card-front, .card-back { backface-visibility: hidden; }
+    .card-back { transform: rotateY(180deg); }
+    
+    .drag-item { cursor: grab; transition: all 0.3s ease; }
+    .drag-item:hover { transform: translateY(-2px); box-shadow: 0 8px 16px rgba(0,0,0,0.3); }
+    .drag-item:active { cursor: grabbing; }
+    .drag-item.dragging { opacity: 0.6; transform: scale(1.08) rotate(5deg); }
+    
+    .drop-zone { transition: all 0.2s; }
+    .drop-zone.drag-over { transform: scale(1.02); background-color: rgba(236, 72, 153, 0.8) !important; }
+    
+    .matched { animation: matchPulse 0.5s ease; }
+    @keyframes matchPulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .shake { animation: shake 0.4s ease; }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+      20%, 40%, 60%, 80% { transform: translateX(4px); }
+    }
+    
+    .fade-in { animation: fadeIn 0.3s ease forwards; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .slide-in { animation: slideIn 0.4s ease forwards; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(-20px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    
+    button { transition: all 0.3s ease; }
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    button:active:not(:disabled) { transform: translateY(0); }
+    
+    input:focus { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3); }
+    select:focus { box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.3); }
+    
+    .knowledge-tab { transition: all 0.3s ease; position: relative; }
+    .knowledge-tab:hover { background-color: rgba(255, 255, 255, 0.1); }
+    .knowledge-tab.active-tab { border-bottom-color: #ec4899; color: #fbbf24; }
+    
+    .knowledge-content { animation: fadeIn 0.3s ease; }
+    
+    tbody tr:hover { background-color: rgba(255, 255, 255, 0.08) !important; }
+    
+    .subscript { font-size: 0.7em; vertical-align: sub; }
+  </style>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 overflow-auto">
+  <div id="app" class="w-full min-h-full p-4 md:p-6">
+   <header class="text-center mb-6">
+    <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-white mb-2">🔬 Hydrocarbon - Grade 11</h1>
+    <p class="text-purple-200 text-sm md:text-base">Nomenclature, Structure &amp; Properties</p>
+   </header>
+   <nav class="flex flex-wrap justify-center gap-2 mb-6">
+    <button onclick="showSection('formula-to-name')" class="nav-btn px-4 py-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all text-sm font-medium" data-section="formula-to-name">📝 Formula → Name</button> <button onclick="showSection('name-to-formula')" class="nav-btn px-4 py-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all text-sm font-medium" data-section="name-to-formula">🔤 Name → Formula</button> <button onclick="showSection('flashcard')" class="nav-btn px-4 py-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all text-sm font-medium" data-section="flashcard">🎴 Flash Card</button> <button onclick="showSection('matching')" class="nav-btn px-4 py-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all text-sm font-medium" data-section="matching">🎯 Drag &amp; Drop</button> <button onclick="showSection('knowledge')" class="nav-btn px-4 py-2 rounded-full bg-white/20 text-white hover:bg-white/30 transition-all text-sm font-medium" data-section="knowledge">📚 Knowledge</button>
+   </nav><!-- Section 1: Formula to Name -->
+   <section id="formula-to-name" class="section hidden max-w-2xl mx-auto">
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span class="text-2xl">📝</span> Enter Formula → Name</h2>
+     <div class="space-y-4">
+      <div>
+       <label class="block text-purple-200 text-sm mb-2">Enter chemical formula:</label> <input type="text" id="formula-input" placeholder="E.g: CH4, C2H6, C6H6..." class="w-full px-4 py-3 rounded-xl bg-white/20 text-white placeholder-purple-300 border-2 border-transparent focus:border-pink-400 focus:outline-none transition-all">
+      </div><button onclick="lookupFormula()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all shadow-lg">🔍 Search</button>
+      <div id="formula-result" class="hidden p-4 rounded-xl bg-white/10 border-2 border-green-400/50">
+       <p class="text-green-300 text-sm mb-1">Result:</p>
+       <p id="formula-result-text" class="text-white text-lg font-medium"></p>
+      </div>
+     </div>
+    </div>
+   </section><!-- Section 2: Name to Formula -->
+   <section id="name-to-formula" class="section hidden max-w-2xl mx-auto">
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span class="text-2xl">🔤</span> Enter Name → Formula</h2>
+     <div class="space-y-4">
+      <div>
+       <label class="block text-purple-200 text-sm mb-2">Enter compound name:</label> <input type="text" id="name-input" placeholder="E.g: methane, ethane, benzene..." class="w-full px-4 py-3 rounded-xl bg-white/20 text-white placeholder-purple-300 border-2 border-transparent focus:border-pink-400 focus:outline-none transition-all">
+      </div><button onclick="lookupName()" class="w-full py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all shadow-lg">🔍 Search</button>
+      <div id="name-result" class="hidden p-4 rounded-xl bg-white/10 border-2 border-green-400/50">
+       <p class="text-green-300 text-sm mb-1">Result:</p>
+       <p id="name-result-text" class="text-white text-lg font-medium"></p>
+      </div>
+     </div>
+     <div class="mt-6">
+      <p class="text-purple-200 text-sm mb-3">💡 Try compound names:</p>
+      <div class="flex flex-wrap gap-2">
+       <span onclick="document.getElementById('name-input').value='methane'; lookupName();" class="px-3 py-1 bg-white/10 rounded-full text-purple-200 text-xs cursor-pointer hover:bg-white/20 transition-all">methane</span> <span onclick="document.getElementById('name-input').value='ethane'; lookupName();" class="px-3 py-1 bg-white/10 rounded-full text-purple-200 text-xs cursor-pointer hover:bg-white/20 transition-all">ethane</span> <span onclick="document.getElementById('name-input').value='benzene'; lookupName();" class="px-3 py-1 bg-white/10 rounded-full text-purple-200 text-xs cursor-pointer hover:bg-white/20 transition-all">benzene</span> <span onclick="document.getElementById('name-input').value='ethene'; lookupName();" class="px-3 py-1 bg-white/10 rounded-full text-purple-200 text-xs cursor-pointer hover:bg-white/20 transition-all">ethene</span>
+      </div>
+     </div>
+    </div>
+   </section><!-- Section 3: Flashcard Game -->
+   <section id="flashcard" class="section hidden max-w-2xl mx-auto">
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span class="text-2xl">🎴</span> Flash Card</h2>
+     <div class="mb-4">
+      <label class="block text-purple-200 text-sm mb-2">Select hydrocarbon type:</label> <select id="flashcard-category" onchange="initFlashcard()" class="w-full px-4 py-2 rounded-xl bg-white/20 text-white border-2 border-transparent focus:border-pink-400 focus:outline-none"> <option value="all">All Types</option> <option value="alkane">🔗 Alkane</option> <option value="alkene">🔗 Alkene</option> <option value="alkyne">🔗 Alkyne</option> <option value="aromatic">⭕ Arene</option> </select>
+     </div>
+     <div class="flex justify-between items-center mb-4">
+      <span class="text-purple-200 text-sm">Card: <span id="card-index">1</span>/<span id="card-total">10</span></span> <span class="text-green-300 text-sm">✅ Correct: <span id="flashcard-score">0</span></span>
+     </div>
+     <div class="card-flip h-64 mb-4">
+      <div id="flashcard-inner" class="card-inner w-full h-full relative cursor-pointer" onclick="flipCard()">
+       <div class="card-front absolute w-full h-full bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex flex-col items-center justify-center p-6 shadow-xl">
+        <p class="text-purple-200 text-sm mb-2">Formula:</p>
+        <p id="flashcard-formula" class="text-white text-3xl font-bold"></p>
+        <p class="text-purple-200 text-xs mt-4">👆 Click to reveal answer</p>
+       </div>
+       <div class="card-back absolute w-full h-full bg-gradient-to-br from-green-500 to-teal-500 rounded-2xl flex flex-col items-center justify-center p-6 shadow-xl">
+        <p class="text-green-200 text-sm mb-2">Name:</p>
+        <p id="flashcard-name" class="text-white text-2xl font-bold text-center"></p>
+        <p class="text-green-200 text-xs mt-4">👆 Click to flip</p>
+       </div>
+      </div>
+     </div>
+     <div class="flex gap-3">
+      <button onclick="flashcardAnswer(false)" class="flex-1 py-3 bg-red-500/80 text-white font-bold rounded-xl hover:bg-red-600 transition-all">❌ Not Yet</button> <button onclick="flashcardAnswer(true)" class="flex-1 py-3 bg-green-500/80 text-white font-bold rounded-xl hover:bg-green-600 transition-all">✅ Correct</button>
+     </div><button onclick="initFlashcard()" class="w-full mt-3 py-2 bg-white/20 text-white font-medium rounded-xl hover:bg-white/30 transition-all">🔄 Shuffle Cards</button>
+    </div>
+   </section><!-- Section 4: Matching Game -->
+   <section id="matching" class="section hidden max-w-4xl mx-auto">
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+     <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-2"><span class="text-2xl">🎯</span> Drag &amp; Drop Match</h2>
+     <div class="flex justify-between items-center mb-4">
+      <span class="text-purple-200 text-sm">⏱️ Time: <span id="match-time">0</span>s</span> <span class="text-green-300 text-sm">✅ Matched: <span id="match-score">0</span>/8</span>
+     </div>
+     <div class="grid md:grid-cols-2 gap-6">
+      <div>
+       <p class="text-purple-200 text-sm mb-3 text-center">📋 Formulas (drag)</p>
+       <div id="formula-list" class="space-y-2"></div>
+      </div>
+      <div>
+       <p class="text-purple-200 text-sm mb-3 text-center">🎯 Names (drop here)</p>
+       <div id="name-list" class="space-y-2"></div>
+      </div>
+     </div>
+     <div id="match-result" class="hidden mt-4 p-4 rounded-xl bg-green-500/20 border-2 border-green-400/50 text-center">
+      <p class="text-green-300 text-lg font-bold">🎉 Excellent! You completed it!</p>
+      <p id="match-result-time" class="text-green-200 text-sm"></p>
+     </div><button onclick="initMatchingGame()" class="w-full mt-4 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white font-bold rounded-xl hover:from-pink-600 hover:to-purple-600 transition-all shadow-lg">🔄 Play Again</button>
+    </div>
+   </section><!-- Section 5: Knowledge Base -->
+   <section id="knowledge" class="section hidden max-w-4xl mx-auto">
+    <div class="bg-white/10 backdrop-blur-lg rounded-2xl p-6 shadow-xl">
+     <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-2"><span class="text-3xl">📚</span> Hydrocarbon Fundamentals</h2>
+     <div class="flex flex-wrap gap-2 mb-6 border-b border-white/20">
+      <button onclick="toggleKnowledgeTab('definition')" class="knowledge-tab px-4 py-3 text-white border-b-2 border-transparent hover:border-white/40 transition-all active-tab text-sm md:text-base" data-tab="definition">📖 Definition</button> <button onclick="toggleKnowledgeTab('structure')" class="knowledge-tab px-4 py-3 text-white border-b-2 border-transparent hover:border-white/40 transition-all text-sm md:text-base" data-tab="structure">🏗️ Structure</button> <button onclick="toggleKnowledgeTab('properties')" class="knowledge-tab px-4 py-3 text-white border-b-2 border-transparent hover:border-white/40 transition-all text-sm md:text-base" data-tab="properties">⚗️ Properties</button> <button onclick="toggleKnowledgeTab('applications')" class="knowledge-tab px-4 py-3 text-white border-b-2 border-transparent hover:border-white/40 transition-all text-sm md:text-base" data-tab="applications">🔬 Applications</button>
+     </div>
+     <div class="space-y-4">
+      <!-- Definition -->
+      <div id="knowledge-definition" class="knowledge-content fade-in">
+       <h3 class="text-lg font-bold text-purple-300 mb-3">Hydrocarbon Definition &amp; Classification</h3>
+       <div class="bg-white/5 rounded-xl p-4 space-y-4 text-purple-100 text-sm leading-relaxed">
+        <div>
+         <p><strong class="text-white">Definition:</strong> Organic compounds containing only <span class="text-yellow-300 font-bold">Carbon (C)</span> and <span class="text-yellow-300 font-bold">Hydrogen (H)</span> atoms bonded together.</p>
+         <p class="mt-2"><strong class="text-white">General Formula:</strong> <span class="text-yellow-300 font-mono">CₘHₙ</span> (varying ratios depending on structure)</p>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-orange-300 font-bold mb-2">Primary Classification by Saturation:</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><span class="text-blue-300 font-semibold">Saturated Hydrocarbons:</span> Only C-C and C-H single bonds (Alkanes)</li>
+          <li><span class="text-green-300 font-semibold">Unsaturated Hydrocarbons:</span> Contains C=C or C≡C (Alkenes, Alkynes, Arenes)</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-orange-300 font-bold mb-2">Classification by Structure:</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><span class="text-blue-300 font-semibold">Acyclic (Open-chain):</span> Linear or branched structure (no rings)</li>
+          <li><span class="text-green-300 font-semibold">Cyclic:</span> Contains one or more rings (cyclopropane, cyclopentane)</li>
+          <li><span class="text-pink-300 font-semibold">Aromatic:</span> Contains benzene ring with delocalized π electrons</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-orange-300 font-bold mb-2">Classification by Functional Group:</p>
+         <ul class="list-disc list-inside space-y-1 ml-2">
+          <li><span class="text-blue-300 font-semibold">Alkane (CₙH₂ₙ₊₂):</span> Single C-C bonds - fully saturated, inert</li>
+          <li><span class="text-green-300 font-semibold">Alkene (CₙH₂ₙ):</span> One C=C double bond - unsaturated, reactive</li>
+          <li><span class="text-purple-300 font-semibold">Diene (CₙH₂ₙ₋₂):</span> Two C=C double bonds (conjugated or isolated)</li>
+          <li><span class="text-purple-300 font-semibold">Alkyne (CₙH₂ₙ₋₂):</span> One C≡C triple bond - highly unsaturated, very reactive</li>
+          <li><span class="text-pink-300 font-semibold">Arene:</span> Benzene ring C₆H₅- group - aromatic, stable resonance</li>
+         </ul>
+        </div>
+       </div>
+      </div><!-- Structure -->
+      <div id="knowledge-structure" class="knowledge-content hidden fade-in">
+       <h3 class="text-lg font-bold text-orange-300 mb-3">Molecular Structure &amp; Nomenclature</h3>
+       <div class="bg-white/5 rounded-xl p-4 space-y-4 text-purple-100 text-sm leading-relaxed">
+        <div>
+         <p class="text-blue-300 font-bold mb-3">🔗 ALKANE (Saturated - C-C single bonds)</p>
+         <p class="mb-2">• General Formula: <span class="text-yellow-300 font-mono">CₙH₂ₙ₊₂</span> (acyclic) or <span class="text-yellow-300 font-mono">CₙH₂ₙ</span> (cyclic)</p>
+         <p class="mb-2">• Structure: Only C-C and C-H single bonds (σ bonds only)</p>
+         <p class="mb-2">• Hybridization: Carbon sp³ hybridized, tetrahedral geometry</p>
+         <p class="mb-2">• Nomenclature Rules:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>Prefix based on carbon count: meth-, eth-, prop-, but-, pent-, hex-, hept-, oct-, non-, dec-</li>
+          <li>Suffix: <strong>-ane</strong> (e.g., methane, ethane, propane)</li>
+          <li>Branched: Use position numbers and branch names (e.g., 2-methylpropane)</li>
+          <li>Example nomenclature: C₄H₁₀ = butane; C₅H₁₂ = pentane; (CH₃)₄C = neopentane</li>
+         </ul>
+         <p class="mt-2">• Examples: CH₄ (methane), C₂H₆ (ethane), C₃H₈ (propane), C₄H₁₀ (butane)</p>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-green-300 font-bold mb-3">🔗 ALKENE (Unsaturated - C=C double bond)</p>
+         <p class="mb-2">• General Formula: <span class="text-yellow-300 font-mono">CₙH₂ₙ</span> (acyclic) or <span class="text-yellow-300 font-mono">CₙH₂ₙ₋₂</span> (cyclic)</p>
+         <p class="mb-2">• Structure: One or more C=C double bonds (σ + π bonds)</p>
+         <p class="mb-2">• Hybridization: Carbon sp² hybridized, trigonal planar geometry</p>
+         <p class="mb-2">• Nomenclature Rules:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>Suffix: <strong>-ene</strong> (e.g., ethene, propene, butene)</li>
+          <li>Position number: Lowest number for double bond (e.g., 2-butene, 1-pentene)</li>
+          <li>Isomerism: cis-trans isomerism (e.g., cis-2-butene, trans-2-butene)</li>
+          <li>Multiple bonds: Diene (two C=C), triene (three C=C)</li>
+         </ul>
+         <p class="mt-2">• Examples: C₂H₄ (ethene), C₃H₆ (propene), C₄H₈ (1-butene or 2-butene)</p>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-purple-300 font-bold mb-3">🔗 ALKYNE (Unsaturated - C≡C triple bond)</p>
+         <p class="mb-2">• General Formula: <span class="text-yellow-300 font-mono">CₙH₂ₙ₋₂</span> (acyclic) or <span class="text-yellow-300 font-mono">CₙH₂ₙ₋₄</span> (with ring)</p>
+         <p class="mb-2">• Structure: One or more C≡C triple bonds (σ + 2π bonds)</p>
+         <p class="mb-2">• Hybridization: Carbon sp hybridized, linear geometry (180° angle)</p>
+         <p class="mb-2">• Nomenclature Rules:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>Suffix: <strong>-yne</strong> (e.g., ethyne, propyne, butyne)</li>
+          <li>Position number: Lowest number for triple bond (e.g., 1-butyne, 2-butyne)</li>
+          <li>Acidity: Terminal alkynes (HC≡C-R) are weakly acidic, form metal acetylides</li>
+          <li>Multiple triple bonds: Not common in natural compounds</li>
+         </ul>
+         <p class="mt-2">• Examples: C₂H₂ (ethyne/acetylene), C₃H₄ (propyne), C₄H₆ (1-butyne)</p>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-pink-300 font-bold mb-3">⭕ ARENE (Aromatic - Benzene ring)</p>
+         <p class="mb-2">• Structure: 6-membered benzene ring (C₆H₅- as core group) with delocalized π electrons</p>
+         <p class="mb-2">• Hybridization: Carbon sp² hybridized, planar hexagonal geometry</p>
+         <p class="mb-2">• Resonance: Stabilized by resonance (4 kJ/mol more stable than expected)</p>
+         <p class="mb-2">• Nomenclature Rules:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li>Core: C₆H₆ = benzene (parent structure)</li>
+          <li>Monosubstituted: Benzene suffix (e.g., methylbenzene, chlorobenzene)</li>
+          <li>Disubstituted: Position numbers 1,2- (ortho), 1,3- (meta), 1,4- (para)</li>
+          <li>Common names: Toluene (methylbenzene), xylene (dimethylbenzene)</li>
+         </ul>
+         <p class="mt-2">• Examples: C₆H₆ (benzene), C₇H₈ (toluene), C₈H₁₀ (xylene)</p>
+        </div>
+       </div>
+      </div><!-- Properties -->
+      <div id="knowledge-properties" class="knowledge-content hidden fade-in">
+       <h3 class="text-lg font-bold text-cyan-300 mb-3">Chemical Properties &amp; Reaction Mechanisms</h3>
+       <div class="bg-white/5 rounded-xl p-4 space-y-4 text-purple-100 text-sm leading-relaxed">
+        <div>
+         <p class="text-blue-300 font-bold mb-3">🔗 ALKANE (Low reactivity - Substitution &amp; Oxidation)</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><strong class="text-white">Complete Combustion:</strong> CₙH₂ₙ₊₂ + (3n+1)/2 O₂ → n CO₂ + (n+1) H₂O + Heat (ΔH &lt; 0, exothermic)</li>
+          <li><strong class="text-white">Free Radical Halogenation:</strong> CH₄ + Cl₂ → CH₃Cl + HCl (UV light, 3 steps: initiation, propagation, termination)</li>
+          <li><strong class="text-white">Cracking:</strong> Long-chain alkanes break into shorter hydrocarbons (heat, catalyst, pressure)</li>
+          <li><strong class="text-white">Stability:</strong> NO reaction with Br₂ (water), KMnO₄, H₂SO₄ under normal conditions</li>
+          <li><strong class="text-white">Molecular Reactivity:</strong> Increases with chain length; primary &gt; secondary &gt; tertiary carbons</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-green-300 font-bold mb-3">🔗 ALKENE (High reactivity - Addition Reactions)</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><strong class="text-white">Addition of Halogen (Br₂):</strong> C=C + Br₂ → C-Br-C-Br (addition across π bond, brown color decolorizes)</li>
+          <li><strong class="text-white">Oxidation with KMnO₄:</strong> Breaks C=C to form diols (or carboxylic acids if terminal), purple decolorizes</li>
+          <li><strong class="text-white">Hydrogenation:</strong> C=C + H₂ → C-C (Ni/Pt/Pd catalyst, 100-200°C, reduces unsaturation)</li>
+          <li><strong class="text-white">Hydration (Markovnikov's Rule):</strong> C=C + H₂O → C-OH-C (H₂SO₄ catalyst, H adds to C with more H atoms)</li>
+          <li><strong class="text-white">Polymerization:</strong> nC₂H₄ → -(CH₂-CH₂)ₙ- (heat, pressure, catalyst, forms polyethylene)</li>
+          <li><strong class="text-white">Reaction Speed:</strong> Much faster than alkanes due to accessible π electrons</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-purple-300 font-bold mb-3">🔗 ALKYNE (Extreme reactivity - Multiple Additions)</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><strong class="text-white">Sequential Hydrogenation:</strong> C≡C + 2H₂ → C-C (two-step: triple bond → double bond → single bond)</li>
+          <li><strong class="text-white">Addition of Halogens:</strong> C≡C + 2Br₂ → CBr₂-CBr₂ (decolorizes brown color twice)</li>
+          <li><strong class="text-white">Hydration (Keto-Enol Tautomerism):</strong> HC≡CH + H₂O → CH₃CHO (HgSO₄ catalyst, forms acetaldehyde)</li>
+          <li><strong class="text-white">Terminal Alkyne Acidity:</strong> HC≡C-R + Na → Na⁺C≡C-R + ½H₂ (terminal H weakly acidic, pH ~25)</li>
+          <li><strong class="text-white">Acetylide Formation:</strong> HC≡C-R + Ag(NH₃)₂⁺ → AgC≡C-R (white precipitate, used for identification)</li>
+          <li><strong class="text-white">Reaction Speed:</strong> Fastest of hydrocarbons; both π bonds accessible for attack</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-pink-300 font-bold mb-3">⭕ ARENE (Aromatic Stability - Electrophilic Substitution)</p>
+         <ul class="list-disc list-inside space-y-2 ml-2">
+          <li><strong class="text-white">Electrophilic Aromatic Substitution:</strong> C₆H₆ + Br₂ (FeBr₃ catalyst) → C₆H₅Br + HBr (substitution, not addition)</li>
+          <li><strong class="text-white">Nitration:</strong> C₆H₆ + HNO₃ (H₂SO₄ catalyst) → C₆H₅NO₂ + H₂O (produces nitrobenzene)</li>
+          <li><strong class="text-white">Friedel-Crafts Alkylation:</strong> C₆H₆ + RCl (AlCl₃) → C₆H₅-R + HCl (benzene attacks alkyl carbocation)</li>
+          <li><strong class="text-white">Friedel-Crafts Acylation:</strong> C₆H₆ + RCOCl (AlCl₃) → C₆H₅-CO-R + HCl (adds carbonyl group)</li>
+          <li><strong class="text-white">Aromatic Stability:</strong> Benzene highly stable (resonance stabilization, π electrons delocalized)</li>
+          <li><strong class="text-white">NO Reaction with:</strong> Br₂ (no catalyst), KMnO₄, H₂, simple oxidizing agents</li>
+          <li><strong class="text-white">Directing Effects:</strong> Electron-donating groups (OH, NH₂) activate benzene (ortho/para directors)</li>
+          <li><strong class="text-white">Deactivating Groups:</strong> Electron-withdrawing groups (NO₂, CN) deactivate benzene (meta directors)</li>
+         </ul>
+        </div>
+       </div>
+      </div><!-- Applications -->
+      <div id="knowledge-applications" class="knowledge-content hidden fade-in">
+       <h3 class="text-lg font-bold text-yellow-300 mb-3">Applications, Synthesis Methods &amp; Industrial Uses</h3>
+       <div class="bg-white/5 rounded-xl p-4 space-y-4 text-purple-100 text-sm leading-relaxed">
+        <div>
+         <p class="text-blue-300 font-bold mb-2">🔗 ALKANE APPLICATIONS</p>
+         <p class="text-orange-300 font-semibold mb-2">Common Uses:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4 mb-3">
+          <li><strong class="text-white">CH₄ (Methane):</strong> Natural gas (heating, electricity, chemical synthesis)</li>
+          <li><strong class="text-white">C₃H₈ (Propane):</strong> LPG cylinders, heating fuel, cooking</li>
+          <li><strong class="text-white">C₅-C₁₂ (Petrol):</strong> Gasoline for vehicles, solvents</li>
+          <li><strong class="text-white">C₁₂-C₁₈ (Diesel):</strong> Heavy vehicle fuel, heating oil</li>
+          <li><strong class="text-white">C₁₈-C₃₀ (Fuel oil):</strong> Industrial heating, ship fuel, lubricants</li>
+          <li><strong class="text-white">Paraffin Wax:</strong> Candles, cosmetics, sealing agent</li>
+         </ul>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Synthesis/Production:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li><strong>Fractional Distillation:</strong> Crude oil → heated to 350-400°C → vaporized → fractionating column (temperature gradient) → products separate by boiling point</li>
+          <li><strong>Hydrogenation:</strong> CₙH₂ₙ + H₂ → CₙH₂ₙ₊₂ (Ni catalyst, 150-200°C, increases saturation)</li>
+          <li><strong>Coal Liquefaction:</strong> Coal + H₂ (catalyst, heat, pressure) → liquid hydrocarbons</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-green-300 font-bold mb-2">🔗 ALKENE APPLICATIONS</p>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Uses:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4 mb-3">
+          <li><strong class="text-white">C₂H₄ (Ethene):</strong> Fruit ripening hormone (released by plants), polyethylene (PE) plastic production, antifreeze, anesthetics</li>
+          <li><strong class="text-white">C₃H₆ (Propene):</strong> Polypropylene (PP) containers, packaging, fibers, acrylic production</li>
+          <li><strong class="text-white">C₄H₈ (1,3-Butadiene):</strong> Synthetic rubber for tires, gaskets, tubing</li>
+          <li><strong class="text-white">Isoprene (C₅H₈):</strong> Synthetic rubber production, tire components</li>
+         </ul>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Synthesis/Production:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li><strong>Dehydrogenation:</strong> CₙH₂ₙ₊₂ → CₓH₂ₓ + CᵧH₂ᵧ₊₂ (500-600°C, catalyst, heat, pressure → removes H₂)</li>
+          <li><strong>Ethanol Dehydration:</strong> C₂H₅OH → C₂H₄ + H₂O (170-180°C, H₂SO₄ or Al₂O₃ catalyst, removes water)</li>
+          <li><strong>Cracking:</strong> Long-chain alkanes → smaller alkenes + alkanes (heat + catalyst, breaks C-C bonds)</li>
+          <li><strong>Ethene Production from Naphtha:</strong> Steaming of naphtha at 800-900°C → produces ethene, propene, butadiene</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-purple-300 font-bold mb-2">🔗 ALKYNE APPLICATIONS</p>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Uses:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4 mb-3">
+          <li><strong class="text-white">C₂H₂ (Ethyne/Acetylene):</strong> Welding (~3000°C flame), metal cutting torches, chemical synthesis, carbide welding</li>
+          <li><strong class="text-white">Chemical Synthesis:</strong> Vinyl chloride (PVC plastics), acrylonitrile (acrylic fibers), acrylic acid</li>
+          <li><strong class="text-white">Explosives:</strong> Trinitrotoluene (TNT) synthesis via acetylene derivatives</li>
+          <li><strong class="text-white">Pharmaceutical Precursor:</strong> Used in synthesis of vitamins and medicines</li>
+         </ul>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Production Method:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li><strong>Calcium Carbide Method:</strong> CaO + 3C → CaC₂ + CO (2500°C electric arc furnace, high temperature)</li>
+          <li><strong>Hydrolysis:</strong> CaC₂ + 2H₂O → Ca(OH)₂ + C₂H₂↑ (room temperature, water liberates acetylene gas)</li>
+          <li><strong>Partial Oxidation of Natural Gas:</strong> CH₄ + O₂ (catalyst, high temp) → C₂H₂ + H₂O (modern industrial method)</li>
+         </ul>
+        </div>
+        <hr class="border-white/20">
+        <div>
+         <p class="text-pink-300 font-bold mb-2">⭕ ARENE APPLICATIONS</p>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Uses:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4 mb-3">
+          <li><strong class="text-white">C₆H₆ (Benzene):</strong> Industrial solvent, pharmaceutical synthesis, pesticides, dyes, detergents, explosives (TNT)</li>
+          <li><strong class="text-white">C₇H₈ (Toluene/Methylbenzene):</strong> Paint thinner, solvent, TNT (trinitrotoluene) explosive, polyurethane foam</li>
+          <li><strong class="text-white">C₈H₁₀ (Xylene/Dimethylbenzene):</strong> Industrial solvent, lacquers, varnishes, synthetic fiber production, dye solvent</li>
+          <li><strong class="text-white">C₁₀H₈ (Naphthalene):</strong> Mothballs, dyes, lubricants, phthalic anhydride synthesis</li>
+          <li><strong class="text-white">Phenol (C₆H₅OH):</strong> Disinfectants, plastics (Bakelite, epoxy), adhesives</li>
+          <li><strong class="text-white">Aniline (C₆H₅NH₂):</strong> Dyes (azo dyes), pharmaceuticals, herbicides</li>
+         </ul>
+         <p class="text-orange-300 font-semibold mb-2">Industrial Production/Extraction:</p>
+         <ul class="list-disc list-inside space-y-1 ml-4">
+          <li><strong>Oil Reforming:</strong> Naphtha fraction (100-200°C boiling point) → catalytic reforming with Pt catalyst (350-500°C) → produces aromatic compounds</li>
+          <li><strong>Distillation of Coal Tar:</strong> Coal tar (by-product of coal coking) → fractional distillation → benzene, toluene, naphthalene separated</li>
+          <li><strong>Acetylene Trimerization:</strong> 3C₂H₂ → C₆H₆ (200-300°C, Fe or Ni catalyst, produces benzene from acetylene)</li>
+          <li><strong>Dealkylation:</strong> Toluene/xylene → benzene removal of methyl groups (hydrogen at high temp)</li>
+         </ul>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   </section><!-- Reference Table -->
+   <div class="max-w-4xl mx-auto mt-6">
+    <button onclick="toggleReference()" class="w-full py-3 bg-white/10 text-white font-medium rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"> <span id="ref-icon">📚</span> Reference Table <span id="ref-arrow">▼</span> </button>
+    <div id="reference-table" class="hidden mt-4 bg-white/10 backdrop-blur-lg rounded-2xl p-4 overflow-x-auto fade-in">
+     <table class="w-full text-sm">
+      <thead>
+       <tr class="text-purple-200 border-b border-white/20">
+        <th class="py-2 px-3 text-left">Formula</th>
+        <th class="py-2 px-3 text-left">Name</th>
+        <th class="py-2 px-3 text-left">Type</th>
+       </tr>
+      </thead>
+      <tbody id="reference-body" class="text-white"></tbody>
+     </table>
+    </div>
+   </div>
+  </div>
+  <script>
+    const c = [
+      {f: "CH₄", n: "Methane", g: "alkane", t: "Alkane"},
+      {f: "C₂H₆", n: "Ethane", g: "alkane", t: "Alkane"},
+      {f: "C₃H₈", n: "Propane", g: "alkane", t: "Alkane"},
+      {f: "C₄H₁₀", n: "Butane", g: "alkane", t: "Alkane"},
+      {f: "C₅H₁₂", n: "Pentane", g: "alkane", t: "Alkane"},
+      {f: "C₆H₁₄", n: "Hexane", g: "alkane", t: "Alkane"},
+      {f: "C₈H₁₈", n: "Octane", g: "alkane", t: "Alkane"},
+      {f: "C₁₀H₂₂", n: "Decane", g: "alkane", t: "Alkane"},
+      {f: "C₁₂H₂₆", n: "Dodecane", g: "alkane", t: "Alkane"},
+      {f: "C₁₆H₃₄", n: "Hexadecane", g: "alkane", t: "Alkane"},
+      {f: "C₂₀H₄₂", n: "Eicosane", g: "alkane", t: "Alkane"},
+      {f: "C₂H₄", n: "Ethene", g: "alkene", t: "Alkene"},
+      {f: "C₃H₆", n: "Propene", g: "alkene", t: "Alkene"},
+      {f: "C₄H₈", n: "Butene", g: "alkene", t: "Alkene"},
+      {f: "C₅H₁₀", n: "Pentene", g: "alkene", t: "Alkene"},
+      {f: "C₆H₁₂", n: "Hexene", g: "alkene", t: "Alkene"},
+      {f: "C₈H₁₆", n: "Octene", g: "alkene", t: "Alkene"},
+      {f: "C₁₀H₂₀", n: "Decene", g: "alkene", t: "Alkene"},
+      {f: "C₂H₂", n: "Ethyne", g: "alkyne", t: "Alkyne"},
+      {f: "C₃H₄", n: "Propyne", g: "alkyne", t: "Alkyne"},
+      {f: "C₄H₆", n: "Butyne", g: "alkyne", t: "Alkyne"},
+      {f: "C₆H₁₀", n: "Hexyne", g: "alkyne", t: "Alkyne"},
+      {f: "C₆H₆", n: "Benzene", g: "aromatic", t: "Arene"},
+      {f: "C₇H₈", n: "Toluene", g: "aromatic", t: "Arene"},
+      {f: "C₈H₁₀", n: "Xylene", g: "aromatic", t: "Arene"},
+      {f: "C₉H₁₂", n: "Mesitylene", g: "aromatic", t: "Arene"},
+      {f: "C₁₀H₈", n: "Naphthalene", g: "aromatic", t: "Arene"},
+      {f: "C₁₄H₁₀", n: "Anthracene", g: "aromatic", t: "Arene"}
+    ];
+
+    const defaultConfig = {
+      app_title: "🔬 Hydrocarbon - Grade 11",
+      primary_color: "#4f46e5",
+      secondary_color: "#ec4899",
+      text_color: "#ffffff",
+      font_family: "Quicksand"
+    };
+
+    let config = { ...defaultConfig };
+    let currentSection = 'formula-to-name';
+    let flashcardDeck = [];
+    let currentCardIndex = 0;
+    let flashcardScore = 0;
+    let matchingPairs = [];
+    let matchedCount = 0;
+    let matchTimer = null;
+    let matchSeconds = 0;
+    let draggedElement = null;
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange: async (newConfig) => {
+          config = { ...defaultConfig, ...newConfig };
+          applyConfig();
+        },
+        mapToCapabilities: (cfg) => ({
+          recolorables: [
+            {
+              get: () => cfg.primary_color || defaultConfig.primary_color,
+              set: (v) => { cfg.primary_color = v; window.elementSdk.setConfig({ primary_color: v }); }
+            },
+            {
+              get: () => cfg.secondary_color || defaultConfig.secondary_color,
+              set: (v) => { cfg.secondary_color = v; window.elementSdk.setConfig({ secondary_color: v }); }
+            }
+          ],
+          borderables: [],
+          fontEditable: {
+            get: () => cfg.font_family || defaultConfig.font_family,
+            set: (v) => { cfg.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+          },
+          fontSizeable: undefined
+        }),
+        mapToEditPanelValues: (cfg) => new Map([
+          ["app_title", cfg.app_title || defaultConfig.app_title]
+        ])
+      });
+    }
+
+    function applyConfig() {
+      document.getElementById('main-title').textContent = config.app_title || defaultConfig.app_title;
+      document.body.style.fontFamily = `${config.font_family || defaultConfig.font_family}, sans-serif`;
+    }
+
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+      document.getElementById(sectionId).classList.remove('hidden');
+      document.getElementById(sectionId).classList.add('fade-in');
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-white/40');
+        if (btn.dataset.section === sectionId) btn.classList.add('bg-white/40');
+      });
+      currentSection = sectionId;
+      if (sectionId === 'flashcard') initFlashcard();
+      if (sectionId === 'matching') initMatchingGame();
+    }
+
+    function toggleKnowledgeTab(tabName) {
+      document.querySelectorAll('.knowledge-content').forEach(c => c.classList.add('hidden'));
+      document.querySelectorAll('.knowledge-tab').forEach(t => t.classList.remove('border-white', 'border-b-2'));
+      document.getElementById(`knowledge-${tabName}`).classList.remove('hidden');
+      document.querySelector(`[data-tab="${tabName}"]`).classList.add('border-white', 'border-b-2');
+    }
+
+function f_h(s) {
+    return s.replace(/([A-Z][a-z]?)(\d+)/g, '$1<sub>$2</sub>')
+            .replace(/\(([^)]+)\)(\d+)/g, '($1)<sub>$2</sub>');
+}
+
+function p_f(s) {
+    let m = {}, i = 0, n = s.length;
+    while (i < n) {
+        let c = s[i];
+        if (c === '(') {
+            let j = i, b = 0;
+            while (j < n) {
+                if (s[j] === '(') b++;
+                if (s[j] === ')') b--;
+                if (b === 0) break;
+                j++;
+            }
+            let sub = s.slice(i + 1, j);
+            i = j + 1;
+            let d = "";
+            while (i < n && s[i] >= '0' && s[i] <= '9') { d += s[i]; i++; }
+            let v = d === "" ? 1 : parseInt(d);
+            let r = p_f(sub);
+            for (let e in r) m[e] = (m[e] || 0) + r[e] * v;
+        } else if (c >= 'A' && c <= 'Z') {
+            let e = c; i++;
+            if (i < n && s[i] >= 'a' && s[i] <= 'z') { e += s[i]; i++; }
+            let d = "";
+            while (i < n && s[i] >= '0' && s[i] <= '9') { d += s[i]; i++; }
+            let v = d === "" ? 1 : parseInt(d);
+            m[e] = (m[e] || 0) + v;
+        } else i++;
+    }
+    return m;
+}
+
+function g_t(m) {
+    let r = "";
+    if (m['C']) { r += "C" + (m['C'] > 1 ? m['C'] : ""); delete m['C']; }
+    if (m['H']) { r += "H" + (m['H'] > 1 ? m['H'] : ""); delete m['H']; }
+    let ks = Object.keys(m).sort();
+    for (let k of ks) r += k + (m[k] > 1 ? m[k] : "");
+    return r;
+}
+
+async function lookupFormula() {
+    let i = document.getElementById('formula-input'), 
+        t = document.getElementById('formula-result-text'), 
+        d = document.getElementById('formula-result'), 
+        v = i.value.trim();
+    if (!v) return;
+    let s = g_t(p_f(v));
+    try {
+        let u1 = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/fastformula/${s}/cids/JSON`;
+        let r1 = await fetch(u1), j1 = await r1.json();
+        if (j1.IdentifierList && j1.IdentifierList.CID) {
+            let cid = j1.IdentifierList.CID[0];
+            let u2 = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/Title,IUPACName/JSON`;
+            let r2 = await fetch(u2), j2 = await r2.json();
+            if (j2.PropertyTable && j2.PropertyTable.Properties) {
+                let p = j2.PropertyTable.Properties[0], n1 = p.Title || "", n2 = p.IUPACName || "", h = "";
+                if(n1) h += `<span class="text-yellow-400 font-bold">${f_h(v)}</span> → <span class="text-white text-lg">${n1}</span><br>`;
+                if(n2 && n2.toLowerCase() !== n1.toLowerCase()) h += `<span class="text-yellow-400 font-bold">${f_h(v)}</span> → <span class="text-white text-lg">${n2}</span>`;
+                t.innerHTML = h || "không tìm thấy tên.";
+                d.className = "p-4 rounded-xl bg-white/10 border-2 border-green-400/50 fade-in";
+                d.classList.remove('hidden');
+                return;
+            }
+        }
+        t.innerHTML = `ct: ${f_h(v)} (không có dữ liệu tên)`;
+        d.className = "p-4 rounded-xl bg-white/10 border-2 border-yellow-400/50 fade-in";
+    } catch (e) {
+        t.textContent = "❌ lỗi kết nối.";
+        d.className = "p-4 rounded-xl bg-white/10 border-2 border-red-400/50 fade-in";
+    }
+    d.classList.remove('hidden');
+}
+
+async function lookupName() {
+    let i = document.getElementById('name-input'), 
+        t = document.getElementById('name-result-text'), 
+        d = document.getElementById('name-result'), 
+        v = i.value.trim();
+    if (!v) return;
+    try {
+        let u1 = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/${encodeURIComponent(v)}/cids/JSON`;
+        let r1 = await fetch(u1), j1 = await r1.json();
+        if (j1.IdentifierList && j1.IdentifierList.CID) {
+            let cid = j1.IdentifierList.CID[0];
+            let u2 = `https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/${cid}/property/MolecularFormula,Title,IUPACName/JSON`;
+            let r2 = await fetch(u2), j2 = await r2.json();
+            if (j2.PropertyTable && j2.PropertyTable.Properties) {
+                let p = j2.PropertyTable.Properties[0], f = p.MolecularFormula || "", n1 = p.Title || "", n2 = p.IUPACName || "", vl = v.toLowerCase(), o = "";
+                if (n1 && n1.toLowerCase() !== vl) o = n1;
+                else if (n2 && n2.toLowerCase() !== vl) o = n2;
+                
+                let h = `<span class="text-white font-bold text-lg">${v}</span> → <span class="text-yellow-400 text-lg">${f_h(f)}</span>`;
+                if (o) h += `<br><span class="text-white font-bold text-lg">${v}</span> → <span class="text-green-300 text-lg">${o}</span>`;
+                
+                t.innerHTML = h;
+                d.className = "p-4 rounded-xl bg-white/10 border-2 border-green-400/50 fade-in";
+                d.classList.remove('hidden');
+                return;
+            }
+        }
+        t.textContent = "❌ không tìm thấy.";
+        d.className = "p-4 rounded-xl bg-white/10 border-2 border-red-400/50 fade-in";
+    } catch (e) {
+        t.textContent = "❌ lỗi kết nối.";
+        d.className = "p-4 rounded-xl bg-white/10 border-2 border-red-400/50 fade-in";
+    }
+    d.classList.remove('hidden');
+}
+
+    function initFlashcard() {
+      const category = document.getElementById('flashcard-category').value;
+      let filtered = category === 'all' ? c : c.filter(x => x.g === category);
+      flashcardDeck = filtered.sort(() => Math.random() - 0.5).slice(0, 12);
+      currentCardIndex = 0;
+      flashcardScore = 0;
+      document.getElementById('card-total').textContent = flashcardDeck.length;
+      document.getElementById('flashcard-score').textContent = '0';
+      showCurrentCard();
+    }
+
+    function showCurrentCard() {
+      if (currentCardIndex >= flashcardDeck.length) {
+        document.getElementById('flashcard-formula').textContent = "🎉";
+        document.getElementById('flashcard-name').textContent = `Complete! Correct: ${flashcardScore}/${flashcardDeck.length}`;
+        return;
+      }
+      const card = flashcardDeck[currentCardIndex];
+      document.getElementById('flashcard-formula').textContent = card.f;
+      document.getElementById('flashcard-name').textContent = card.n;
+      document.getElementById('card-index').textContent = currentCardIndex + 1;
+      document.getElementById('flashcard-inner').classList.remove('flipped');
+    }
+
+    function flipCard() {
+      document.getElementById('flashcard-inner').classList.toggle('flipped');
+    }
+
+    function flashcardAnswer(correct) {
+      if (correct) flashcardScore++;
+      document.getElementById('flashcard-score').textContent = flashcardScore;
+      currentCardIndex++;
+      
+      // Auto-reshuffle when reaching the end
+      if (currentCardIndex >= flashcardDeck.length) {
+        setTimeout(() => {
+          initFlashcard();
+        }, 500);
+      } else {
+        showCurrentCard();
+      }
+    }
+
+    function initMatchingGame() {
+      matchedCount = 0;
+      matchSeconds = 0;
+      if (matchTimer) clearInterval(matchTimer);
+      document.getElementById('match-score').textContent = '0';
+      document.getElementById('match-time').textContent = '0';
+      document.getElementById('match-result').classList.add('hidden');
+      
+      matchingPairs = c.sort(() => Math.random() - 0.5).slice(0, 8);
+      const formulaList = document.getElementById('formula-list');
+      const shuffledFormulas = [...matchingPairs].sort(() => Math.random() - 0.5);
+      formulaList.innerHTML = shuffledFormulas.map(item => `
+        <div class="drag-item px-4 py-3 bg-purple-500/60 rounded-xl text-white font-medium text-center shadow-lg"
+             draggable="true"
+             data-formula="${item.f}"
+             ondragstart="handleDragStart(event)"
+             ondragend="handleDragEnd(event)">
+          ${item.f}
+        </div>
+      `).join('');
+      
+      const nameList = document.getElementById('name-list');
+      const shuffledNames = [...matchingPairs].sort(() => Math.random() - 0.5);
+      nameList.innerHTML = shuffledNames.map(item => `
+        <div class="drop-zone px-4 py-3 bg-pink-500/40 rounded-xl text-white font-medium text-center border-2 border-dashed border-pink-300/50 min-h-[52px] flex items-center justify-center"
+             data-name="${item.n}"
+             data-expected-formula="${item.f}"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)"
+             ondrop="handleDrop(event)">
+          ${item.n}
+        </div>
+      `).join('');
+      
+      document.getElementById('match-score').innerHTML = `0/${matchingPairs.length}`;
+      matchTimer = setInterval(() => {
+        matchSeconds++;
+        document.getElementById('match-time').textContent = matchSeconds;
+      }, 1000);
+    }
+
+    function handleDragStart(e) {
+      draggedElement = e.target;
+      e.target.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', e.target.dataset.formula);
+    }
+
+    function handleDragEnd(e) {
+      e.target.classList.remove('dragging');
+      draggedElement = null;
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      e.currentTarget.classList.add('drag-over', 'bg-pink-500/60');
+    }
+
+    function handleDragLeave(e) {
+      e.currentTarget.classList.remove('drag-over', 'bg-pink-500/60');
+    }
+
+    function handleDrop(e) {
+      e.preventDefault();
+      const dropZone = e.currentTarget;
+      dropZone.classList.remove('drag-over', 'bg-pink-500/60');
+      const draggedFormula = e.dataTransfer.getData('text/plain');
+      const expectedFormula = dropZone.dataset.expectedFormula;
+      
+      if (draggedFormula === expectedFormula) {
+        matchedCount++;
+        document.getElementById('match-score').textContent = matchedCount;
+        dropZone.classList.add('matched', 'bg-green-500/60', 'border-green-400');
+        dropZone.classList.remove('border-dashed', 'border-pink-300/50');
+        dropZone.innerHTML = `<span class="text-green-200">✓</span> ${dropZone.dataset.name} = ${draggedFormula}`;
+        dropZone.ondragover = null;
+        dropZone.ondrop = null;
+        if (draggedElement) draggedElement.remove();
+        if (matchedCount >= matchingPairs.length) {
+          clearInterval(matchTimer);
+          document.getElementById('match-result-time').textContent = `Time: ${matchSeconds}s | Perfect! 🎉`;
+          document.getElementById('match-result').classList.remove('hidden');
+        }
+      } else {
+        dropZone.classList.add('shake', 'bg-red-500/60');
+        setTimeout(() => {
+          dropZone.classList.remove('shake', 'bg-red-500/60');
+        }, 500);
+      }
+    }
+
+    function toggleReference() {
+      const table = document.getElementById('reference-table');
+      const arrow = document.getElementById('ref-arrow');
+      if (table.classList.contains('hidden')) {
+        table.classList.remove('hidden');
+        arrow.textContent = '▲';
+        populateReferenceTable();
+      } else {
+        table.classList.add('hidden');
+        arrow.textContent = '▼';
+      }
+    }
+
+    function populateReferenceTable() {
+      const tbody = document.getElementById('reference-body');
+      const categories = {};
+      c.forEach(item => {
+        if (!categories[item.t]) categories[item.t] = [];
+        categories[item.t].push(item);
+      });
+      
+      const typeColors = {
+        'Alkane': { bg: 'bg-blue-500/40', header: 'text-blue-300', icon: '🔗' },
+        'Alkene': { bg: 'bg-green-500/40', header: 'text-green-300', icon: '🔗' },
+        'Alkyne': { bg: 'bg-purple-500/40', header: 'text-purple-300', icon: '🔗' },
+        'Arene': { bg: 'bg-pink-500/40', header: 'text-pink-300', icon: '⭕' }
+      };
+      
+      let html = '';
+      Object.keys(categories).forEach(type => {
+        const color = typeColors[type] || { bg: 'bg-white/20', header: 'text-white', icon: '⚛️' };
+        html += `<tr><td colspan="3" class="py-2 px-3 bg-white/20 font-bold ${color.header}">${color.icon} ${type}</td></tr>`;
+        categories[type].forEach(item => {
+          html += `<tr class="border-b border-white/10 hover:bg-white/5">
+            <td class="py-2 px-3 font-medium text-yellow-300">${item.f}</td>
+            <td class="py-2 px-3">${item.n}</td>
+            <td class="py-2 px-3 text-purple-300 text-xs">${item.t}</td>
+          </tr>`;
+        });
+      });
+      
+      tbody.innerHTML = html;
+    }
+
+    document.getElementById('formula-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') lookupFormula();
+    });
+    document.getElementById('name-input').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') lookupName();
+    });
+
+    showSection('formula-to-name');
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d72192987cf0454',t:'MTc3MjY0MDA3My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
