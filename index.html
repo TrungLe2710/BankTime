@@ -54,7 +54,7 @@
             <button @click="v = 2; g()" :class="v == 2 ? 'text-purple-600' : 'text-slate-500 hover:text-purple-500 transition-colors'">cửa hàng</button>
             <button @click="pu = cu?.n; v = 3; g()" :class="v == 3 && pu == cu?.n ? 'text-purple-600' : 'text-slate-500 hover:text-purple-500 transition-colors'">hồ sơ</button>
             <a href="/hoahoc" target="_blank" class="text-slate-500 hover:text-purple-500 transition-colors flex items-center">hóa học</a>
-          </div>
+        </div>
         </div>
         <div class="flex items-center gap-4">
           <button @click="pu = cu?.n; v = 3; g()" class="bg-slate-100 text-slate-700 px-4 py-1.5 rounded-full hover:bg-slate-200 transition-all text-sm font-bold shadow-sm border border-slate-200" x-text="'@' + cu?.n"></button>
