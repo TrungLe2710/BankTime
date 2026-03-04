@@ -33,7 +33,7 @@ let app = () => ({
   async take(i) { await fetch('/api?c=tk&i=' + i + '&n=' + this.cu.n); this.g(); },
   async done(i) { await fetch('/api?c=dn&i=' + i); this.g(); },
   async buy(i) { await fetch('/api?c=buy&i=' + i + '&n=' + this.cu.n); this.g(); },
-  async af(f) { await fetch('/api?c=af&n=' + this.cu.n + '&f=' + f); this.sf = ''; this.g(); },
+  async af(f) { await fetch('/api?c=af&n=' + this.cu.n + '&f=' + f); this.sf = ''; this.g(); alert('đã thêm bạn!'); },
   async sm(r, c) {
     let rr = r || this.cc;
     let cc = c || this.tm;
@@ -50,10 +50,10 @@ let app = () => ({
     for (let i = 0; i < this.us.length; i++) if (this.us[i].n == n) this.mu = this.us[i];
   },
   so(x) {
-    let k = prompt('nhập kết quả công việc (đường dẫn hoặc mô tả chi tiết):');
+    let k = prompt('nhập kết quả công việc:');
     if (k) {
       this.sm(x.o, 'kết quả việc "' + x.d + '": ' + k);
-      alert('đã gửi kết quả qua tin nhắn riêng!');
+      alert('đã gửi kết quả!');
     }
   },
   ib() {
@@ -75,6 +75,7 @@ let app = () => ({
     }
     return ls;
   },
+  iff(n) { return this.fl().includes(n); },
   sl() {
     if (!this.sf) return [];
     return this.us.filter(x => x.n.includes(this.sf) && x.n != this.cu.n);
